@@ -1,0 +1,6 @@
+version=1
+id=3268535174
+title=SQSystem Map QuestMarker NPC
+description=This mod add npc quest mark on map for Soul Quest System from SF.
+tags=Build 41;Interface;Map
+visibility=public
