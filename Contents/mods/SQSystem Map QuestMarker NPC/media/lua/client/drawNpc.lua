@@ -27,9 +27,9 @@ local npcList = {
     {name = "Gabriel Walker", x = 9295, y = 8580},
     {name = "Dylan Harris", x = 13847, y = 10355},
     {name = "Sergente Grif", x = 9331, y = 8640},
-    {name = "Angelica Stella", x = 9331, y = 8640},
+    {name = "Angelica Stella", x = 9344, y = 8603},
     {name = "Heather Thomas", x = 9315, y = 8624},
-    {name = "Elia Rima", x = 9334, y = 8613},
+    {name = "Elia Rima", x = 9344, y = 8613},
     {name = "Bob Repair", x = 9340, y = 8578},
     {name = "Mike Pozzo", x = 9315, y = 8638},
     {name = "Rosa China", x = 9270, y = 8491},
@@ -70,6 +70,15 @@ local hidequestitem = getTexture("media/textures/hide-quest-star.png")
 -- local npcToDraw = {}
 
 function getNPCByName(npcName)
+    -- Gestione del caso speciale per "Grif"
+    if npcName == "Grif" then
+        for _, npc in ipairs(npcList) do
+            if npc.name == "Sergente Grif" then
+                return npc
+            end
+        end
+    end
+    
     for _, npc in ipairs(npcList) do
         if npcName == npc.name:gsub(" ", "") then
             return npc
