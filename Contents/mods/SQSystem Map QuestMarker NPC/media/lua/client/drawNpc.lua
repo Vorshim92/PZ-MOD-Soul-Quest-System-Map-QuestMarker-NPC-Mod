@@ -1,5 +1,30 @@
 require "ISUI/ISPanel"
 require "ISButton"  
+require "SFQuest_Database"
+
+-- SFQuest_Database.WorldPool use this table of npcs
+-- example:
+-- SFQuest_Database.WorldPool, {
+--     identity = "Questyno_Grif",
+--     square = "9331x8640x0",
+--     name = "IGUI_SFQuest_Questyno_Grif_Name",
+--     faction = "LaResistenza",
+--     picture = "media/textures/Picture_Grif.png",
+-- } 
+-- we can use getText(name)
+
+--  or maybe SFQuest_Database.MannequinPool
+-- SFQuest_Database.MannequinPool["9344x8603x0"] = {
+--     sprite = "location_shop_mall_01_65",
+--     direction = "S",
+--     beard = "",
+--     hair = "Bun",
+--     haircolor = "0.5,0.2,0.0",
+--     outfit = "AngelicaStella"
+-- }
+-- outfit for the name and MannequinPool[key] for coordinates
+
+--we can improve this database with more proprieties like the npc role (benzinaio)
 
 local originalISWorldMap_render = ISWorldMap.render;
 local originalISWorldMap_createChildren = ISWorldMap.createChildren;
