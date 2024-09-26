@@ -67,13 +67,15 @@ local function getWorldEventProgress()
         for k2,v2 in pairs(player:getModData().missionProgress.WorldEvent) do
             local squareTable = luautils.split(k2, "x");
             local x, y, z = tonumber(squareTable[1]), tonumber(squareTable[2]), tonumber(squareTable[3]);
-            local completed = v.dialoguecode and v.dialoguecode:find("Complete") and true or false
+            local completed = v2.dialoguecode and v2.dialoguecode:find("Complete") and true or false
             local npcName = v2.identity
+            print("WorldEvent: ", k2, npcName)
             local gas_station_attendant = false
 
             for k, v in pairs(npcWorldDb) do
                 if v.identity == npcName then
                     npcName = getText(v.name)
+                    print("trovato npc: ", npcName)
                     if v.occupation == "gas_station_attendant" then
                         gas_station_attendant = true
                     end
@@ -87,6 +89,7 @@ local function getWorldEventProgress()
                 completed = completed,
                 gas_station_attendant = gas_station_attendant
             })
+            print("tempWorldEvent inserito in tabella con nome: ", npcName)
         end
     end
     return tempWorldEvent
@@ -102,10 +105,12 @@ local function getClickEventProgress()
             -- dal commands del ClickEvent acquisisco il guid della quest attiva (category2)
             local commands = luautils.split(v.commands, "x");
             local questId = commands[2]
+            print("clickevent per questId: ", questId)
             local clickEventName = ""
             for k, v in ipairs(player:getModData().missionProgress.Category2) do
                 if v.guid == questId then
                     clickEventName = getText(v.text)
+                    print("clickEventName: ", clickEventName)
                     break
                 end
             end
@@ -115,6 +120,7 @@ local function getClickEventProgress()
                 y = y,
                 name = clickEventName
             })
+            print("tempClickEvent inserito in tabella con nome: ", clickEventName)
         end
     end
     return tempClickEvent
@@ -139,6 +145,7 @@ function ISWorldMap:createChildren(...)
     self:addChild(self.questItemBtn)
     self.worldEventDb = getWorldEventProgress()
     self.clickEventDb = getClickEventProgress()
+    print("dentro createChildren")
 end
 
 function ISWorldMap:render()
@@ -147,7 +154,8 @@ function ISWorldMap:render()
     self.questItemBtn:setImage(self.showQuestItem and clickevent or hidequestitem)
     self.questGiverBtn:setImage(self.showQuestGiver and getQuest or hidequest)
 
-    if self.worldEventDb and #self.worldEventDb > 0 and  self.showQuestGiverthen then
+    if self.worldEventDb and #self.worldEventDb > 0 and self.showQuestGiverthen then
+        print("dentro render worldEventDb")
         for i, v in ipairs(self.worldEventDb) do    
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
@@ -169,6 +177,7 @@ function ISWorldMap:render()
         end
     end
     if self.clickEventDb and #self.clickEventDb > 0 and self.showQuestItem then
+        print("dentro render clickEventDb")
         for i, v in ipairs(self.clickEventDb) do    
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
