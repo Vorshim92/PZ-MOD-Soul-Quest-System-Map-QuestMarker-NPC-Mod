@@ -69,13 +69,13 @@ local function getWorldEventProgress()
             local x, y, z = tonumber(squareTable[1]), tonumber(squareTable[2]), tonumber(squareTable[3]);
             local completed = v.dialoguecode and v.dialoguecode:find("Complete") and true or false
             local npcName = v2.identity
-            local benzinaio = false
+            local gas_station_attendant = false
 
             for k, v in pairs(npcWorldDb) do
                 if v.identity == npcName then
                     npcName = getText(v.name)
-                    if v.benzinaio then
-                        benzinaio = true
+                    if v.occupation == "gas_station_attendant" then
+                        gas_station_attendant = true
                     end
                     break
                 end
@@ -85,7 +85,7 @@ local function getWorldEventProgress()
                 square = k2,
                 name = npcName,
                 completed = completed,
-                benzinaio = benzinaio
+                gas_station_attendant = gas_station_attendant
             })
         end
     end
@@ -152,7 +152,7 @@ function ISWorldMap:render()
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
             local completed = v.completed
-            if v.benzinaio then
+            if v.gas_station_attendant then
                 if completed then
                     self:drawTextureScaledAspect(benzinagive, x, y, 32, 32, 1, 1, 1, 1)
                 else
