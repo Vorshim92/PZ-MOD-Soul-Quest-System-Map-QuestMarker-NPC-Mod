@@ -69,13 +69,13 @@ local function getWorldEventProgress()
             local x, y, z = tonumber(squareTable[1]), tonumber(squareTable[2]), tonumber(squareTable[3]);
             local completed = v2.dialoguecode and v2.dialoguecode:find("Complete") and true or false
             local npcName = v2.identity
-            print("WorldEvent: ", k2, npcName)
+            -- print("WorldEvent: ", k2, npcName)
             local gas_station_attendant = false
 
             for k, v in pairs(npcWorldDb) do
                 if v.identity == npcName then
                     npcName = getText(v.name)
-                    print("trovato npc: ", npcName)
+                    -- print("trovato npc: ", npcName)
                     if v.occupation == "gas_station_attendant" then
                         gas_station_attendant = true
                     end
@@ -84,12 +84,13 @@ local function getWorldEventProgress()
             end
 
             table.insert(tempWorldEvent, {
-                square = k2,
+                x = x,
+                y = y,
                 name = npcName,
                 completed = completed,
                 gas_station_attendant = gas_station_attendant
             })
-            print("tempWorldEvent inserito in tabella con nome: ", npcName)
+            -- print("tempWorldEvent inserito in tabella con nome: ", npcName)
         end
     end
     return tempWorldEvent
@@ -105,12 +106,12 @@ local function getClickEventProgress()
             -- dal commands del ClickEvent acquisisco il guid della quest attiva (category2)
             local commands = luautils.split(v2.commands, ";");
             local questId = commands[2]
-            print("clickevent per questId: ", questId)
+            -- print("clickevent per questId: ", questId)
             local clickEventName = ""
             for k, v in ipairs(player:getModData().missionProgress.Category2) do
                 if v.guid == questId then
                     clickEventName = getText(v.text)
-                    print("clickEventName: ", clickEventName)
+                    -- print("clickEventName: ", clickEventName)
                     break
                 end
             end
@@ -120,15 +121,22 @@ local function getClickEventProgress()
                 y = y,
                 name = clickEventName
             })
-            print("tempClickEvent inserito in tabella con nome: ", clickEventName)
+            -- print("tempClickEvent inserito in tabella con nome: ", clickEventName)
         end
     end
     return tempClickEvent
 end
 
+local worldEventDb = {}
+local clickEventDb = {}
 
-
-
+local originalISWorldMap_ShowWorldMap = ISWorldMap.ShowWorldMap
+function ISWorldMap:ShowWorldMap(...)
+    originalISWorldMap_ShowWorldMap(self, ...)
+    worldEventDb = getWorldEventProgress()
+    clickEventDb = getClickEventProgress()
+    print("dentro ShowWorldMap")
+end
 
 function ISWorldMap:createChildren(...)
     originalISWorldMap_createChildren(self, ...)
@@ -143,10 +151,12 @@ function ISWorldMap:createChildren(...)
     self.questItemBtn:initialise()
     self.questItemBtn:instantiate()
     self:addChild(self.questItemBtn)
-    self.worldEventDb = getWorldEventProgress()
-    self.clickEventDb = getClickEventProgress()
-    print("dentro createChildren")
+    -- self.worldEventDb = getWorldEventProgress()
+    -- self.clickEventDb = getClickEventProgress()
+    -- print("dentro createChildren")
+    -- a quanto pare non viene richiamato ogni volta che viene riaperta la mappa
 end
+
 
 function ISWorldMap:render()
     originalISWorldMap_render(self)
@@ -154,9 +164,9 @@ function ISWorldMap:render()
     self.questItemBtn:setImage(self.showQuestItem and clickevent or hidequestitem)
     self.questGiverBtn:setImage(self.showQuestGiver and getQuest or hidequest)
 
-    if self.worldEventDb and #self.worldEventDb > 0 and self.showQuestGiverthen then
-        print("dentro render worldEventDb")
-        for i, v in ipairs(self.worldEventDb) do    
+    if worldEventDb and #worldEventDb > 0 and self.showQuestGiver then
+        -- print("dentro render worldEventDb")
+        for i, v in ipairs(worldEventDb) do    
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
             local completed = v.completed
@@ -176,16 +186,14 @@ function ISWorldMap:render()
             self:drawText(v.name, x - 10, y + 32, 0, 0, 0, 1, UIFont.Small)
         end
     end
-    if self.clickEventDb and #self.clickEventDb > 0 and self.showQuestItem then
-        print("dentro render clickEventDb")
-        for i, v in ipairs(self.clickEventDb) do    
+    if clickEventDb and #clickEventDb > 0 and self.showQuestItem then
+        -- print("dentro render clickEventDb")
+        for i, v in ipairs(clickEventDb) do    
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
             local name = v.name
-            local uiX = math.floor(self.mapAPI:worldToUIX(x, y))
-            local uiY = math.floor(self.mapAPI:worldToUIY(x, y))
-            self:drawTextureScaledAspect(clickevent, uiX, uiY, 32, 32, 1, 1, 1, 1)
-            self:drawText(name, uiX - 35, uiY + 32, 0, 0, 0, 1, UIFont.Small)       
+            self:drawTextureScaledAspect(clickevent, x, y, 32, 32, 1, 1, 1, 1)
+            self:drawText(name, x - 35, y + 32, 0, 0, 0, 1, UIFont.Small)       
         end
     end
 end
