@@ -103,7 +103,7 @@ local function getClickEventProgress()
             local squareTable = luautils.split(k2, "x");
             local x, y, z = tonumber(squareTable[1]), tonumber(squareTable[2]), tonumber(squareTable[3]);
             -- dal commands del ClickEvent acquisisco il guid della quest attiva (category2)
-            local commands = luautils.split(v.commands, "x");
+            local commands = luautils.split(v.commands, ";");
             local questId = commands[2]
             print("clickevent per questId: ", questId)
             local clickEventName = ""
