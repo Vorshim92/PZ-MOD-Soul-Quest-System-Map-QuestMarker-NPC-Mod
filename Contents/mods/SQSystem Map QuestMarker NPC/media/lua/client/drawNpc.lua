@@ -1,5 +1,4 @@
 require "ISUI/ISPanel"
-require "ISButton"  
 require "SFQuest_Database"
 
 -- SFQuest_Database.WorldPool use this table of npcs
@@ -138,23 +137,49 @@ function ISWorldMap:ShowWorldMap(...)
     print("dentro ShowWorldMap")
 end
 
+local originalISWorldMap_close = ISWorldMap.close
+function ISWorldMap:close()
+    originalISWorldMap_close(self)
+    worldEventDb = {}
+    clickEventDb = {}
+end
+
 function ISWorldMap:createChildren(...)
     originalISWorldMap_createChildren(self, ...)
+
     
-    self.questGiverBtn = ISButton:new(self.width - 20 - 456, self.height - 20 - 48, 48, 48, "", self, function(self) self:handleQuestGiver(not self.showQuestGiver) end)
+    local btnSize = self.texViewIsometric and self.texViewIsometric:getWidth() or 48
+    local buttons = self.buttonPanel.joypadButtons
+    local spacing = 20
+
+    for _, btn in ipairs(buttons) do
+        btn:setX(btn.x + btnSize + spacing)
+    end
+    
+    self.questGiverBtn = ISButton:new(buttons[1].x - spacing - btnSize, 0, btnSize, btnSize, "", self, function(self)
+        self:handleQuestGiver(not self.showQuestGiver)
+    end)
     self.questGiverBtn:setImage(self.showQuestGiver and getQuest or hidequest)
-    self.questGiverBtn:initialise()
-    self.questGiverBtn:instantiate()
-    self:addChild(self.questGiverBtn)
-    self.questItemBtn = ISButton:new(self.width - 20 - 524, self.height - 20 - 48, 48, 48, "", self, function(self) self:handleQuestItem(not self.showQuestItem) end)
+    self.questGiverBtn:setVisible(true)
+    self.buttonPanel:addChild(self.questGiverBtn)
+    table.insert(buttons, 1, self.questGiverBtn)
+    
+    self.questItemBtn = ISButton:new(buttons[1].x - spacing - btnSize, 0, btnSize, btnSize, "", self, function(self)
+        self:handleQuestItem(not self.showQuestItem)
+    end)
     self.questItemBtn:setImage(self.showQuestItem and clickevent or hidequestitem)
-    self.questItemBtn:initialise()
-    self.questItemBtn:instantiate()
-    self:addChild(self.questItemBtn)
-    -- self.worldEventDb = getWorldEventProgress()
-    -- self.clickEventDb = getClickEventProgress()
-    -- print("dentro createChildren")
-    -- a quanto pare non viene richiamato ogni volta che viene riaperta la mappa
+    self.questItemBtn:setVisible(true)
+    self.buttonPanel:addChild(self.questItemBtn)
+    table.insert(buttons, 1, self.questItemBtn)
+
+
+    -- Update the buttonPanel's list of buttons
+    self.buttonPanel:insertNewListOfButtons(buttons)
+
+    local btnCount = #buttons
+    self.buttonPanel:setX(self.width - spacing - (btnSize * btnCount + spacing * (btnCount - 1)))
+    self.buttonPanel:setWidth(btnSize * btnCount + spacing * (btnCount - 1))
+
 end
 
 
@@ -183,7 +208,10 @@ function ISWorldMap:render()
                     self:drawTextureScaledAspect(getQuest, x, y, 32, 32, 1, 1, 1, 1)
                 end
             end
-            self:drawText(v.name, x - 10, y + 32, 0, 0, 0, 1, UIFont.Small)
+            local name = v.name
+            local nameWidth = getTextManager():MeasureStringX(UIFont.Small, name)
+            print("NPCName: ", name)
+            self:drawText(v.name, x - nameWidth/2, y + 32, 0, 0, 0, 1, UIFont.Small)
         end
     end
     if clickEventDb and #clickEventDb > 0 and self.showQuestItem then
@@ -192,8 +220,11 @@ function ISWorldMap:render()
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
             local name = v.name
+            local nameWidth = getTextManager():MeasureStringX(UIFont.Small, name)
+            print("questName: ", name)
+            
             self:drawTextureScaledAspect(clickevent, x, y, 32, 32, 1, 1, 1, 1)
-            self:drawText(name, x - 35, y + 32, 0, 0, 0, 1, UIFont.Small)       
+            self:drawText(name, x - nameWidth/2, y + 32, 0, 0, 0, 1, UIFont.Small)       
         end
     end
 end
