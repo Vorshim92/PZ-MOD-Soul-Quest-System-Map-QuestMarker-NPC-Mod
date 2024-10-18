@@ -194,24 +194,35 @@ function ISWorldMap:render()
         for i, v in ipairs(worldEventDb) do    
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
+            local iconWidth = 32
+            local iconHeight = 32
             local completed = v.completed
+        
             if v.gas_station_attendant then
                 if completed then
-                    self:drawTextureScaledAspect(benzinagive, x, y, 32, 32, 1, 1, 1, 1)
+                    self:drawTextureScaledAspect(benzinagive, x, y, iconWidth, iconHeight, 1, 1, 1, 1)
                 else
-                    self:drawTextureScaledAspect(benzinatake, x, y, 32, 32, 1, 1, 1, 1)
+                    self:drawTextureScaledAspect(benzinatake, x, y, iconWidth, iconHeight, 1, 1, 1, 1)
                 end
             else
                 if completed then
-                    self:drawTextureScaledAspect(completeQuest, x, y, 32, 32, 1, 1, 1, 1)
+                    self:drawTextureScaledAspect(completeQuest, x, y, iconWidth, iconHeight, 1, 1, 1, 1)
                 else
-                    self:drawTextureScaledAspect(getQuest, x, y, 32, 32, 1, 1, 1, 1)
+                    self:drawTextureScaledAspect(getQuest, x, y, iconWidth, iconHeight, 1, 1, 1, 1)
                 end
             end
+        
             local name = v.name
             local nameWidth = getTextManager():MeasureStringX(UIFont.Small, name)
-            print("NPCName: ", name)
-            self:drawText(v.name, x - nameWidth/2, y + 32, 0, 0, 0, 1, UIFont.Small)
+            local iconCenterX = x + iconWidth / 2
+            local textX = iconCenterX - nameWidth / 2
+            -- Ottieni il livello di zoom corrente
+            local currentZoom = self.mapAPI:getZoomF() --max zoom = 11; min zoom = 24
+            print("currentZoom: ", currentZoom)
+            -- Disegna il testo solo se il livello di zoom è sufficientemente alto
+            if currentZoom >= 14 then
+                self:drawText(name, textX, y + iconHeight, 0, 0, 0, 1, UIFont.Small)
+            end
         end
     end
     if clickEventDb and #clickEventDb > 0 and self.showQuestItem then
@@ -219,12 +230,21 @@ function ISWorldMap:render()
         for i, v in ipairs(clickEventDb) do    
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
-            local name = v.name
-            local nameWidth = getTextManager():MeasureStringX(UIFont.Small, name)
-            print("questName: ", name)
             
             self:drawTextureScaledAspect(clickevent, x, y, 32, 32, 1, 1, 1, 1)
-            self:drawText(name, x - nameWidth/2, y + 32, 0, 0, 0, 1, UIFont.Small)       
+            local iconWidth = 32
+            local iconHeight = 32
+            local name = v.name
+            local nameWidth = getTextManager():MeasureStringX(UIFont.Small, name)
+            local iconCenterX = x + iconWidth / 2
+            local textX = iconCenterX - nameWidth / 2
+            -- Ottieni il livello di zoom corrente
+            local currentZoom = self.mapAPI:getZoomF() --max zoom = 11; min zoom = 24
+
+            -- Disegna il testo solo se il livello di zoom è sufficientemente alto
+            if currentZoom >= 14 then
+                self:drawText(name, textX, y + iconHeight, 0, 0, 0, 1, UIFont.Small)
+            end
         end
     end
 end
