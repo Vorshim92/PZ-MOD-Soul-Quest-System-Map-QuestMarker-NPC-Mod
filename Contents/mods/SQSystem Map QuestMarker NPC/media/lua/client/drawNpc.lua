@@ -217,8 +217,8 @@ function ISWorldMap:render()
             local iconCenterX = x + iconWidth / 2
             local textX = iconCenterX - nameWidth / 2
             -- Ottieni il livello di zoom corrente
-            local currentZoom = self.mapAPI:getZoomF() --max zoom = 11; min zoom = 24
-            print("currentZoom: ", currentZoom)
+            local currentZoom = self.mapAPI:getZoomF() --from UIWorldMapV1 java --max zoom = 11; min zoom = 24
+            -- print("currentZoom: ", currentZoom)
             -- Disegna il testo solo se il livello di zoom è sufficientemente alto
             if currentZoom >= 14 then
                 self:drawText(name, textX, y + iconHeight, 0, 0, 0, 1, UIFont.Small)
