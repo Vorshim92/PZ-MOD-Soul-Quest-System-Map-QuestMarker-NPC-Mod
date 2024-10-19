@@ -144,42 +144,42 @@ function ISWorldMap:close()
     clickEventDb = {}
 end
 
-function ISWorldMap:createChildren(...)
-    originalISWorldMap_createChildren(self, ...)
+function ISWorldMap:createChildren()
+    originalISWorldMap_createChildren(self)
 
     
     local btnSize = self.texViewIsometric and self.texViewIsometric:getWidth() or 48
     local buttons = self.buttonPanel.joypadButtons
     local spacing = 20
 
-    for _, btn in ipairs(buttons) do
-        btn:setX(btn.x + btnSize + spacing)
-    end
     
-    self.questGiverBtn = ISButton:new(buttons[1].x - spacing - btnSize, 0, btnSize, btnSize, "", self, function(self)
+    self.questGiverBtn = ISButton:new(0, 0, btnSize, btnSize, "", self, function(self)
         self:handleQuestGiver(not self.showQuestGiver)
     end)
     self.questGiverBtn:setImage(self.showQuestGiver and getQuest or hidequest)
     self.questGiverBtn:setVisible(true)
     self.buttonPanel:addChild(self.questGiverBtn)
-    table.insert(buttons, 1, self.questGiverBtn)
+    table.insert(buttons,1, self.questGiverBtn)
     
-    self.questItemBtn = ISButton:new(buttons[1].x - spacing - btnSize, 0, btnSize, btnSize, "", self, function(self)
+    self.questItemBtn = ISButton:new(0, 0, btnSize, btnSize, "", self, function(self)
         self:handleQuestItem(not self.showQuestItem)
     end)
     self.questItemBtn:setImage(self.showQuestItem and clickevent or hidequestitem)
     self.questItemBtn:setVisible(true)
     self.buttonPanel:addChild(self.questItemBtn)
-    table.insert(buttons, 1, self.questItemBtn)
-
+    table.insert(buttons,1, self.questItemBtn)
+    
+    for i, btn in ipairs(buttons) do
+        btn:setX((i - 1) * (btnSize + spacing))
+    end
 
     -- Update the buttonPanel's list of buttons
-    self.buttonPanel:insertNewListOfButtons(buttons)
-
+    
     local btnCount = #buttons
-    self.buttonPanel:setX(self.width - spacing - (btnSize * btnCount + spacing * (btnCount - 1)))
     self.buttonPanel:setWidth(btnSize * btnCount + spacing * (btnCount - 1))
-
+    self.buttonPanel:setX(self.width - spacing - self.buttonPanel:getWidth())
+    
+    self.buttonPanel:insertNewListOfButtons(buttons)
 end
 
 
@@ -219,7 +219,7 @@ function ISWorldMap:render()
             -- Ottieni il livello di zoom corrente
             local currentZoom = self.mapAPI:getZoomF() --from UIWorldMapV1 java --max zoom = 11; min zoom = 24
             -- print("currentZoom: ", currentZoom)
-            -- Disegna il testo solo se il livello di zoom è sufficientemente alto
+            -- Disegna il testo solo se il livello di zoom Ã¨ sufficientemente alto
             if currentZoom >= 14 then
                 self:drawText(name, textX, y + iconHeight, 0, 0, 0, 1, UIFont.Small)
             end
@@ -241,12 +241,10 @@ function ISWorldMap:render()
             -- Ottieni il livello di zoom corrente
             local currentZoom = self.mapAPI:getZoomF() --max zoom = 11; min zoom = 24
 
-            -- Disegna il testo solo se il livello di zoom è sufficientemente alto
+            -- Disegna il testo solo se il livello di zoom Ã¨ sufficientemente alto
             if currentZoom >= 14 then
                 self:drawText(name, textX, y + iconHeight, 0, 0, 0, 1, UIFont.Small)
             end
         end
     end
 end
-
-
