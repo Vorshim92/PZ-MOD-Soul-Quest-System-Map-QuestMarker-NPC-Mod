@@ -99,7 +99,7 @@ local function getClickEventProgress()
     local tempClickEvent = {}
     local player = getPlayer()
     if player:getModData().missionProgress and player:getModData().missionProgress.ClickEvent then
-        for k2, v2 in ipairs(player:getModData().missionProgress.ClickEvent) do
+        for k2, v2 in pairs(player:getModData().missionProgress.ClickEvent) do
             local squareTable = luautils.split(v2.square, "x");
             local x, y, z = tonumber(squareTable[1]), tonumber(squareTable[2]), tonumber(squareTable[3]);
             -- dal commands del ClickEvent acquisisco il guid della quest attiva (category2)
