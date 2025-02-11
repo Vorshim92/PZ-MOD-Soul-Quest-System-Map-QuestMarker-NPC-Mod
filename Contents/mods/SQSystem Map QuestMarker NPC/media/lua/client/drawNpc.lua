@@ -130,8 +130,8 @@ local worldEventDb = {}
 local clickEventDb = {}
 
 local originalISWorldMap_ShowWorldMap = ISWorldMap.ShowWorldMap
-function ISWorldMap:ShowWorldMap(...)
-    originalISWorldMap_ShowWorldMap(self, ...)
+function ISWorldMap.ShowWorldMap(...)
+    originalISWorldMap_ShowWorldMap(...)
     worldEventDb = getWorldEventProgress()
     clickEventDb = getClickEventProgress()
     print("dentro ShowWorldMap")
