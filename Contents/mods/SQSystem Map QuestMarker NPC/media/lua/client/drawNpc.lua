@@ -48,13 +48,14 @@ local hidequestitem = getTexture("media/textures/hide-quest-star.png")
 
 
 
-function ISWorldMap:handleQuestGiver(state)
-    self.showQuestGiver = state
+function ISWorldMap:handleQuestGiver(button)
+    self.showQuestGiver = not self.showQuestGiver
+    button:setImage(self.showQuestGiver and hidequest or getQuest)
 end
-function ISWorldMap:handleQuestItem(state)
-    self.showQuestItem = state
+function ISWorldMap:handleQuestItem(button)
+    self.showQuestItem = not self.showQuestItem
+    button:setImage(self.showQuestItem and hidequestitem or completeQuest)
 end
-
 
 
 
@@ -153,17 +154,15 @@ function ISWorldMap:createChildren()
     local spacing = 20
 
     
-    self.questGiverBtn = ISButton:new(0, 0, btnSize, btnSize, "", self, function(self)
-        self:handleQuestGiver(not self.showQuestGiver)
-    end)
+    self.questGiverBtn = ISButton:new(0, 0, btnSize, btnSize, "", self, ISWorldMap.handleQuestGiver)
+    self.questGiverBtn:forceImageSize(btnSize-5, btnSize-5)
     self.questGiverBtn:setImage(self.showQuestGiver and getQuest or hidequest)
     self.questGiverBtn:setVisible(true)
     self.buttonPanel:addChild(self.questGiverBtn)
     table.insert(buttons,1, self.questGiverBtn)
     
-    self.questItemBtn = ISButton:new(0, 0, btnSize, btnSize, "", self, function(self)
-        self:handleQuestItem(not self.showQuestItem)
-    end)
+    self.questItemBtn = ISButton:new(0, 0, btnSize, btnSize, "", self, ISWorldMap.handleQuestItem)
+    self.questItemBtn:forceImageSize(btnSize-5, btnSize-5)
     self.questItemBtn:setImage(self.showQuestItem and clickevent or hidequestitem)
     self.questItemBtn:setVisible(true)
     self.buttonPanel:addChild(self.questItemBtn)
@@ -186,8 +185,8 @@ end
 function ISWorldMap:render()
     originalISWorldMap_render(self)
     
-    self.questItemBtn:setImage(self.showQuestItem and clickevent or hidequestitem)
-    self.questGiverBtn:setImage(self.showQuestGiver and getQuest or hidequest)
+    -- self.questItemBtn:setImage(self.showQuestItem and clickevent or hidequestitem)
+    -- self.questGiverBtn:setImage(self.showQuestGiver and getQuest or hidequest)
 
     if worldEventDb and #worldEventDb > 0 and self.showQuestGiver then
         -- print("dentro render worldEventDb")
