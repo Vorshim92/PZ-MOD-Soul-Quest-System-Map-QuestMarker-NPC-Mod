@@ -26,12 +26,30 @@ require "SFQuest_Database"
 
 --we can improve this database with more proprieties like the npc role (benzinaio)
 
+local fontSizeValue  = getCore():getOptionFontSize()
+-- Mappa il valore di font size a un fattore di scala più appropriato
+local fontSizeScale
+if fontSizeValue == 1 then      -- Default
+    fontSizeScale = 1.0
+elseif fontSizeValue == 2 then  -- 1x
+    fontSizeScale = 1.5
+elseif fontSizeValue == 3 then  -- 2x
+    fontSizeScale = 2.0
+elseif fontSizeValue == 4 then  -- 3x
+    fontSizeScale = 2.5
+else                           -- 4x o superiore
+    fontSizeScale = 3
+end
+
+fontSizeScale = fontSizeScale * 0.8
+
 local originalISWorldMap_render = ISWorldMap.render;
 local originalISWorldMap_createChildren = ISWorldMap.createChildren;
 ISWorldMap.showQuestGiver = true  
 ISWorldMap.showQuestItem = true  
 
 local npcWorldDb = SFQuest_Database.WorldPool
+
 
 
 -- Lista degli NPC con le loro coordinate
@@ -193,8 +211,8 @@ function ISWorldMap:render()
         for i, v in ipairs(worldEventDb) do    
             local x = math.floor(self.mapAPI:worldToUIX(v.x, v.y))
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
-            local iconWidth = 32
-            local iconHeight = 32
+            local iconWidth = 32*fontSizeScale
+            local iconHeight = 32*fontSizeScale
             local completed = v.completed
         
             if v.gas_station_attendant then
@@ -231,8 +249,8 @@ function ISWorldMap:render()
             local y = math.floor(self.mapAPI:worldToUIY(v.x, v.y))
             
             self:drawTextureScaledAspect(clickevent, x, y, 32, 32, 1, 1, 1, 1)
-            local iconWidth = 32
-            local iconHeight = 32
+            local iconWidth = 32*fontSizeScale
+            local iconHeight = 32*fontSizeScale
             local name = v.name
             local nameWidth = getTextManager():MeasureStringX(UIFont.Small, name)
             local iconCenterX = x + iconWidth / 2
